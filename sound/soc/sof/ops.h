@@ -287,6 +287,14 @@ snd_sof_dsp_set_power_state(struct snd_sof_dev *sdev,
 	return ret;
 }
 
+static inline int snd_sof_register_clocks(struct snd_sof_dev *sdev)
+{
+	if (sof_ops(sdev) && sof_ops(sdev)->register_clocks)
+		return sof_ops(sdev)->register_clocks(sdev);
+
+	return 0;
+}
+
 /* debug */
 void snd_sof_dsp_dbg_dump(struct snd_sof_dev *sdev, const char *msg, u32 flags);
 

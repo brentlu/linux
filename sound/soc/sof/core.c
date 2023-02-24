@@ -275,6 +275,13 @@ skip_dsp_init:
 	/* hereafter all FW boot flows are for PM reasons */
 	sdev->first_boot = false;
 
+	/* register clock devices */
+	ret = snd_sof_register_clocks(sdev);
+	if (ret < 0) {
+		dev_err(sdev->dev, "error: failed to register clocks %d\n", ret);
+		goto fw_trace_err;
+	}
+
 	/* now register audio DSP platform driver and dai */
 	ret = devm_snd_soc_register_component(sdev->dev, &sdev->plat_drv,
 					      sof_ops(sdev)->drv,

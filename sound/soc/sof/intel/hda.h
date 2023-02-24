@@ -600,6 +600,7 @@ void hda_ipc_dump(struct snd_sof_dev *sdev);
 void hda_ipc_irq_dump(struct snd_sof_dev *sdev);
 void hda_dsp_d0i3_work(struct work_struct *work);
 int hda_dsp_disable_interrupts(struct snd_sof_dev *sdev);
+int hda_register_dai_clocks(struct snd_sof_dev *sdev);
 
 /*
  * DSP PCM Operations.

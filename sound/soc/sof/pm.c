@@ -373,3 +373,36 @@ void snd_sof_complete(struct device *dev)
 	sdev->system_suspend_target = SOF_SUSPEND_NONE;
 }
 EXPORT_SYMBOL(snd_sof_complete);
+
+int snd_sof_send_pm_dai_clk_req_ipc(struct snd_sof_dev *sdev, u32 id, bool en,
+				    u32 dai_type, u32 dai_index)
+{
+	struct sof_ipc_pm_clk_req pm_clk_req;
+	int ret;
+
+	memset(&pm_clk_req, 0, sizeof(pm_clk_req));
+
+	/* set IPC DAI clock control */
+	pm_clk_req.hdr.size = sizeof(pm_clk_req);
+	pm_clk_req.hdr.cmd = SOF_IPC_GLB_PM_MSG | SOF_IPC_PM_CLK_REQ;
+
+	pm_clk_req.type = SOF_PM_CLK_DAI;
+	pm_clk_req.id = id;
+	pm_clk_req.en = en ? 1 : 0;
+
+	/* DAI clock specific data */
+	pm_clk_req.dai.type = dai_type;
+	pm_clk_req.dai.dai_index = dai_index;
+
+	/* send IPC to the DSP */
+	ret = sof_ipc_tx_message_no_reply(sdev->ipc, &pm_clk_req,
+					  sizeof(pm_clk_req));
+	if (ret < 0) {
+		dev_err(sdev->dev, "failed to request dai clock %s, id 0x%x\n",
+			en ? "enable" : "disable", id);
+		return ret;
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL(snd_sof_send_pm_dai_clk_req_ipc);

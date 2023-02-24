@@ -286,6 +286,7 @@ struct snd_sof_dsp_ops {
 	int (*set_hw_params_upon_resume)(struct snd_sof_dev *sdev); /* optional */
 	int (*set_power_state)(struct snd_sof_dev *sdev,
 			       const struct sof_dsp_power_state *target_state); /* optional */
+	int (*register_clocks)(struct snd_sof_dev *sdev); /* optional */
 
 	/* DSP clocking */
 	int (*set_clk)(struct snd_sof_dev *sof_dev, u32 freq); /* optional */
@@ -684,6 +685,9 @@ int snd_sof_prepare(struct device *dev);
 void snd_sof_complete(struct device *dev);
 
 void snd_sof_new_platform_drv(struct snd_sof_dev *sdev);
+
+int snd_sof_send_pm_dai_clk_req_ipc(struct snd_sof_dev *sdev, u32 id, bool en,
+				    u32 dai_type, u32 dai_index);
 
 /*
  * Compress support

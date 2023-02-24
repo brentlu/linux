@@ -53,4 +53,28 @@ struct sof_ipc_pm_gate {
 	uint32_t reserved[5];
 } __packed;
 
+/* PM clock type */
+enum sof_ipc_pm_clk_type {
+	SOF_PM_CLK_DAI = 0,	/**< DAI clock */
+};
+
+/* parameter for SOF_PM_CLK_DAI */
+struct sof_ipc_pm_clk_dai_params {
+	uint32_t type;		/**< DAI type - enum sof_ipc_dai_type */
+	uint32_t dai_index;	/**< index of this type dai */
+} __packed;
+
+/* general purpose clock control - SOF_IPC_PM_CLK_REQ */
+struct sof_ipc_pm_clk_req {
+	struct sof_ipc_cmd_hdr hdr;
+	uint32_t type;		/**< enum sof_ipc_pm_clk_type */
+	uint32_t id;		/**< clock id to operate */
+	uint32_t en;		/**< zero to disable the clock */
+
+	/* clk specific data */
+	union {
+		struct sof_ipc_pm_clk_dai_params dai;
+	};
+} __packed;
+
 #endif

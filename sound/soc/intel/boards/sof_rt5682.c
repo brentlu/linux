@@ -256,6 +256,43 @@ static const struct dmi_system_id sof_rt5682_quirk_table[] = {
 	{}
 };
 
+static int platform_clock_control(struct snd_soc_dapm_widget *w,
+				  struct snd_kcontrol *k, int event)
+{
+	struct snd_soc_dapm_context *dapm = w->dapm;
+	struct snd_soc_card *card = dapm->card;
+	struct sof_card_private *ctx = snd_soc_card_get_drvdata(card);
+	int ret = 0;
+
+	if (!ctx->mclk)
+		return 0;
+
+	switch (event) {
+	case SND_SOC_DAPM_PRE_PMU:
+		if (__clk_is_enabled(ctx->mclk))
+			return 0;
+
+		ret = clk_prepare_enable(ctx->mclk);
+		if (ret < 0) {
+			dev_err(card->dev, "Failed to enable MCLK, ret %d\n",
+				ret);
+			return ret;
+		}
+
+		break;
+	case SND_SOC_DAPM_POST_PMD:
+		if (!__clk_is_enabled(ctx->mclk))
+			return 0;
+
+		clk_disable_unprepare(ctx->mclk);
+		break;
+	default:
+		return 0;
+	}
+
+	return 0;
+}
+
 static int sof_hdmi_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct sof_card_private *ctx = snd_soc_card_get_drvdata(rtd->card);
@@ -530,6 +567,10 @@ static const struct snd_soc_dapm_widget sof_widgets[] = {
 	SND_SOC_DAPM_MIC("Headset Mic", NULL),
 	SND_SOC_DAPM_SPK("Left Spk", NULL),
 	SND_SOC_DAPM_SPK("Right Spk", NULL),
+
+	SND_SOC_DAPM_SUPPLY("Platform Clock", SND_SOC_NOPM, 0, 0,
+			    platform_clock_control, SND_SOC_DAPM_PRE_PMU |
+			    SND_SOC_DAPM_POST_PMD),
 };
 
 static const struct snd_soc_dapm_widget dmic_widgets[] = {
@@ -543,6 +584,10 @@ static const struct snd_soc_dapm_route sof_map[] = {
 
 	/* other jacks */
 	{ "IN1P", NULL, "Headset Mic" },
+
+	/* mclk */
+	{ "Headphone Jack", NULL, "Platform Clock" },
+	{ "Headset Mic", NULL, "Platform Clock" },
 };
 
 static const struct snd_soc_dapm_route dmic_map[] = {
@@ -863,6 +908,7 @@ static int sof_audio_probe(struct platform_device *pdev)
 	struct sof_card_private *ctx;
 	int dmic_be_num, hdmi_num;
 	int ret, ssp_amp, ssp_codec;
+	char clk_name[NAME_SIZE];
 
 	ctx = devm_kzalloc(&pdev->dev, sizeof(*ctx), GFP_KERNEL);
 	if (!ctx)
@@ -905,6 +951,13 @@ static int sof_audio_probe(struct platform_device *pdev)
 			ctx->idisp_codec = true;
 	}
 
+	dev_dbg(&pdev->dev, "sof_rt5682_quirk = %lx\n", sof_rt5682_quirk);
+
+	ssp_amp = (sof_rt5682_quirk & SOF_RT5682_SSP_AMP_MASK) >>
+			SOF_RT5682_SSP_AMP_SHIFT;
+
+	ssp_codec = sof_rt5682_quirk & SOF_RT5682_SSP_CODEC_MASK;
+
 	/* need to get main clock from pmc */
 	if (sof_rt5682_quirk & SOF_RT5682_MCLK_BYTCHT_EN) {
 		ctx->mclk = devm_clk_get(&pdev->dev, "pmc_plt_clk_3");
@@ -923,14 +976,18 @@ static int sof_audio_probe(struct platform_device *pdev)
 				"could not configure MCLK state");
 			return ret;
 		}
+	} else if (sof_rt5682_quirk & SOF_RT5682_MCLK_EN) {
+		/* clock registered by SOF platform driver */
+		snprintf(clk_name, NAME_SIZE, "ssp%d_mclk", ssp_codec);
+
+		ctx->mclk = devm_clk_get(&pdev->dev, clk_name);
+		if (IS_ERR(ctx->mclk)) {
+			ret = PTR_ERR(ctx->mclk);
+			dev_err(&pdev->dev, "Failed to get MCLK %s, ret %d\n",
+				clk_name, ret);
+			return ret;
+		}
 	}
-
-	dev_dbg(&pdev->dev, "sof_rt5682_quirk = %lx\n", sof_rt5682_quirk);
-
-	ssp_amp = (sof_rt5682_quirk & SOF_RT5682_SSP_AMP_MASK) >>
-			SOF_RT5682_SSP_AMP_SHIFT;
-
-	ssp_codec = sof_rt5682_quirk & SOF_RT5682_SSP_CODEC_MASK;
 
 	/* compute number of dai links */
 	sof_audio_card_rt5682.num_links = 1 + dmic_be_num + hdmi_num;

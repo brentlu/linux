@@ -705,6 +705,34 @@ sof_card_dai_links_create(struct device *dev, enum sof_ssp_codec codec_type,
 	if (!links || !cpus)
 		goto devm_err;
 
+	/* HDMI-In SSP */
+	if (sof_rt5682_quirk & SOF_SSP_HDMI_CAPTURE_PRESENT_MASK) {
+		unsigned long hdmi_in_ssp = (sof_rt5682_quirk &
+				SOF_SSP_HDMI_CAPTURE_PRESENT_MASK) >>
+				SOF_NO_OF_HDMI_CAPTURE_SSP_SHIFT;
+		int port = 0;
+
+		for_each_set_bit(port, &hdmi_in_ssp, 32) {
+			links[id].cpus = &cpus[id];
+			links[id].cpus->dai_name = devm_kasprintf(dev, GFP_KERNEL,
+								  "SSP%d Pin", port);
+			if (!links[id].cpus->dai_name)
+				return NULL;
+			links[id].name = devm_kasprintf(dev, GFP_KERNEL, "SSP%d-HDMI", port);
+			if (!links[id].name)
+				return NULL;
+			links[id].id = id + hdmi_id_offset;
+			links[id].codecs = &asoc_dummy_dlc;
+			links[id].num_codecs = 1;
+			links[id].platforms = platform_component;
+			links[id].num_platforms = ARRAY_SIZE(platform_component);
+			links[id].dpcm_capture = 1;
+			links[id].no_pcm = 1;
+			links[id].num_cpus = 1;
+			id++;
+		}
+	}
+
 	/* codec SSP */
 	links[id].name = devm_kasprintf(dev, GFP_KERNEL,
 					"SSP%d-Codec", ssp_codec);
@@ -937,34 +965,6 @@ sof_card_dai_links_create(struct device *dev, enum sof_ssp_codec codec_type,
 		links[id].dpcm_capture = 1;
 		links[id].no_pcm = 1;
 		links[id].num_cpus = 1;
-	}
-
-	/* HDMI-In SSP */
-	if (sof_rt5682_quirk & SOF_SSP_HDMI_CAPTURE_PRESENT_MASK) {
-		unsigned long hdmi_in_ssp = (sof_rt5682_quirk &
-				SOF_SSP_HDMI_CAPTURE_PRESENT_MASK) >>
-				SOF_NO_OF_HDMI_CAPTURE_SSP_SHIFT;
-		int port = 0;
-
-		for_each_set_bit(port, &hdmi_in_ssp, 32) {
-			links[id].cpus = &cpus[id];
-			links[id].cpus->dai_name = devm_kasprintf(dev, GFP_KERNEL,
-								  "SSP%d Pin", port);
-			if (!links[id].cpus->dai_name)
-				return NULL;
-			links[id].name = devm_kasprintf(dev, GFP_KERNEL, "SSP%d-HDMI", port);
-			if (!links[id].name)
-				return NULL;
-			links[id].id = id + hdmi_id_offset;
-			links[id].codecs = &asoc_dummy_dlc;
-			links[id].num_codecs = 1;
-			links[id].platforms = platform_component;
-			links[id].num_platforms = ARRAY_SIZE(platform_component);
-			links[id].dpcm_capture = 1;
-			links[id].no_pcm = 1;
-			links[id].num_cpus = 1;
-			id++;
-		}
 	}
 
 	return links;

@@ -61,6 +61,7 @@ struct sof_rt5682_private {
  * @codec_link: pointer to headset codec dai link
  * @amp_link: pointer to speaker amplifier dai link
  * @link_order_overwrite: custom DAI link order
+ * @link_id_overwrite: custom DAI link ID
  * @rt5682: private data for rt5682 machine driver
  */
 struct sof_card_private {
@@ -84,6 +85,7 @@ struct sof_card_private {
 	struct snd_soc_dai_link *amp_link;
 
 	unsigned long link_order_overwrite;
+	unsigned long link_id_overwrite;
 
 	union {
 		struct sof_rt5682_private rt5682;

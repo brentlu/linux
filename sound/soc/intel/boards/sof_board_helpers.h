@@ -10,6 +10,41 @@
 #include "sof_hdmi_common.h"
 #include "sof_ssp_common.h"
 
+/* Common board quirks: from bit 32 to 63  */
+
+/* SSP port number for headphone codec */
+#define SOF_SSP_PORT_CODEC_SHIFT		32
+#define SOF_SSP_PORT_CODEC_MASK			(GENMASK(34, 32))
+#define SOF_SSP_PORT_CODEC(quirk)		\
+	(((unsigned long)(quirk) << SOF_SSP_PORT_CODEC_SHIFT) & SOF_SSP_PORT_CODEC_MASK)
+
+/* SSP port number for speaker amplifier */
+#define SOF_SSP_PORT_AMP_SHIFT			35
+#define SOF_SSP_PORT_AMP_MASK			(GENMASK(37, 35))
+#define SOF_SSP_PORT_AMP(quirk)			\
+	(((unsigned long)(quirk) << SOF_SSP_PORT_AMP_SHIFT) & SOF_SSP_PORT_AMP_MASK)
+
+/* SSP port number for BT audio offload */
+#define SOF_SSP_PORT_BT_OFFLOAD_SHIFT		38
+#define SOF_SSP_PORT_BT_OFFLOAD_MASK		(GENMASK(40, 38))
+#define SOF_SSP_PORT_BT_OFFLOAD(quirk)		\
+	(((unsigned long)(quirk) << SOF_SSP_PORT_BT_OFFLOAD_SHIFT) & SOF_SSP_PORT_BT_OFFLOAD_MASK)
+
+/* SSP port mask for HDMI capture */
+#define SOF_SSP_MASK_HDMI_CAPTURE_SHIFT		41
+#define SOF_SSP_MASK_HDMI_CAPTURE_MASK		(GENMASK(46, 41))
+#define SOF_SSP_MASK_HDMI_CAPTURE(quirk)	\
+	(((unsigned long)(quirk) << SOF_SSP_MASK_HDMI_CAPTURE_SHIFT) & SOF_SSP_MASK_HDMI_CAPTURE_MASK)
+
+/* Number of idisp HDMI BE link */
+#define SOF_NUM_IDISP_HDMI_SHIFT		47
+#define SOF_NUM_IDISP_HDMI_MASK			(GENMASK(49, 47))
+#define SOF_NUM_IDISP_HDMI(quirk)		\
+	(((unsigned long)(quirk) << SOF_NUM_IDISP_HDMI_SHIFT) & SOF_NUM_IDISP_HDMI_MASK)
+
+/* Board uses BT audio offload */
+#define SOF_BT_OFFLOAD_PRESENT			BIT(50)
+
 enum {
 	SOF_LINK_NONE = 0,
 	SOF_LINK_CODEC,
@@ -95,6 +130,8 @@ struct sof_card_private {
 int sof_intel_board_card_late_probe(struct snd_soc_card *card);
 int sof_intel_board_set_dai_link(struct device *dev, struct snd_soc_card *card,
 				 struct sof_card_private *ctx);
+struct sof_card_private *
+sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk);
 
 struct snd_soc_dai *get_codec_dai_by_name(struct snd_soc_pcm_runtime *rtd,
 					  const char * const dai_name[], int num_dais);

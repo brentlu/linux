@@ -2,6 +2,7 @@
 //
 // Copyright(c) 2023 Intel Corporation. All rights reserved.
 
+#include <sound/intel-nhlt.h>
 #include <sound/soc.h>
 #include "../common/soc-intel-quirks.h"
 #include "hda_dsp_common.h"
@@ -591,6 +592,9 @@ struct sof_card_private *
 sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk)
 {
 	struct sof_card_private *ctx;
+	struct nhlt_acpi_table *nhlt;
+	u32 bt_mask, capture_mask, render_mask, ssp_mask;
+	int new_port;
 
 	dev_dbg(dev, "create ctx, board_quirk 0x%lx\n", board_quirk);
 
@@ -608,23 +612,81 @@ sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk)
 	if (!ctx->hdmi_num)
 		ctx->hdmi_num = 3;
 
+	if (board_quirk & SOF_NHLT_SSP_PORT_OVERWRITE) {
+		nhlt = intel_nhlt_init(dev);
+		if (nhlt) {
+			bt_mask = intel_nhlt_ssp_endpoint_mask(nhlt,
+							       NHLT_DEVICE_BT);
+			capture_mask = intel_nhlt_ssp_dir_mask(dev, nhlt,
+							       NHLT_DIRECTION_CAPTURE);
+			render_mask = intel_nhlt_ssp_dir_mask(dev, nhlt,
+							      NHLT_DIRECTION_RENDER);
+
+			dev_dbg(dev, "nhlt found, bt_mask 0x%x capture_mask 0x%x render_mask 0x%x\n",
+				bt_mask, capture_mask, render_mask);
+		}
+	}
+
 	/* port number/mask of peripherals attached to ssp interface */
-	if (ctx->codec_type != CODEC_NONE)
+	if (ctx->codec_type != CODEC_NONE) {
 		ctx->ssp_codec = (board_quirk & SOF_SSP_PORT_CODEC_MASK) >>
 				SOF_SSP_PORT_CODEC_SHIFT;
 
-	if (ctx->amp_type != CODEC_NONE)
+		if (nhlt) {
+			/* direction: both render and capture */
+			ssp_mask = render_mask & capture_mask;
+			if (hweight32(ssp_mask) == 1) {
+				new_port = ffs(ssp_mask) - 1;
+				if (new_port != ctx->ssp_codec) {
+					dev_info(dev, "codec ssp overwrite: %d->%d\n",
+						 ctx->ssp_codec, new_port);
+					ctx->ssp_codec = new_port;
+				}
+			}
+		}
+	}
+
+	if (ctx->amp_type != CODEC_NONE) {
 		ctx->ssp_amp = (board_quirk & SOF_SSP_PORT_AMP_MASK) >>
 				SOF_SSP_PORT_AMP_SHIFT;
+
+		if (nhlt) {
+			/* direction: render only */
+			ssp_mask = render_mask & ~capture_mask;
+			if (hweight32(ssp_mask) == 1) {
+				new_port = ffs(ssp_mask) - 1;
+				if (new_port != ctx->ssp_amp) {
+					dev_info(dev, "amp ssp overwrite: %d->%d\n",
+						 ctx->ssp_amp, new_port);
+					ctx->ssp_amp = new_port;
+				}
+			}
+		}
+	}
 
 	if (board_quirk & SOF_BT_OFFLOAD_PRESENT) {
 		ctx->bt_offload_present = true;
 		ctx->ssp_bt = (board_quirk & SOF_SSP_PORT_BT_OFFLOAD_MASK) >>
 				SOF_SSP_PORT_BT_OFFLOAD_SHIFT;
+
+		if (nhlt) {
+			/* device type: bt sideband */
+			if (hweight32(bt_mask) == 1) {
+				new_port = ffs(bt_mask) - 1;
+				if (new_port != ctx->ssp_bt) {
+					dev_info(dev, "bt ssp overwrite: %d->%d\n",
+						 ctx->ssp_bt, new_port);
+					ctx->ssp_bt = new_port;
+				}
+			}
+		}
 	}
 
 	ctx->ssp_mask_hdmi_in = (board_quirk & SOF_SSP_MASK_HDMI_CAPTURE_MASK) >>
 				SOF_SSP_MASK_HDMI_CAPTURE_SHIFT;
+
+	if (nhlt)
+		intel_nhlt_free(nhlt);
 
 	return ctx;
 }

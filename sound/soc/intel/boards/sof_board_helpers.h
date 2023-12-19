@@ -45,6 +45,9 @@
 /* Board uses BT audio offload */
 #define SOF_BT_OFFLOAD_PRESENT			BIT(50)
 
+/* Overwrite SSP port number if NHLT is available */
+#define SOF_NHLT_SSP_PORT_OVERWRITE		BIT(51)
+
 enum {
 	SOF_LINK_NONE = 0,
 	SOF_LINK_CODEC,

@@ -10,6 +10,7 @@
 #include <linux/acpi.h>
 #include <linux/mod_devicetable.h>
 #include <linux/soundwire/sdw.h>
+#include <sound/soc-acpi-intel-ssp-common.h>
 
 struct snd_soc_acpi_package_context {
 	char *name;           /* package name */
@@ -72,6 +73,8 @@ static inline struct snd_soc_acpi_mach *snd_soc_acpi_codec_list(void *arg)
  * @subsystem_device: optional PCI SSID device value
  * @subsystem_id_set: true if a value has been written to
  *		      subsystem_vendor and subsystem_device.
+ * @codec_type: headphone codec type
+ * @amp_type: speaker amplifier type
  */
 struct snd_soc_acpi_mach_params {
 	u32 acpi_ipc_irq_index;
@@ -87,6 +90,8 @@ struct snd_soc_acpi_mach_params {
 	unsigned short subsystem_vendor;
 	unsigned short subsystem_device;
 	bool subsystem_id_set;
+	enum snd_soc_acpi_intel_codec codec_type;
+	enum snd_soc_acpi_intel_codec amp_type;
 };
 
 /**

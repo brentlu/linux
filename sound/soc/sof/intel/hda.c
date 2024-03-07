@@ -1285,6 +1285,14 @@ struct snd_soc_acpi_mach *hda_machine_select(struct snd_sof_dev *sdev)
 			tplg_fixup = true;
 		}
 
+		/* report to machine driver if any codecs are found */
+		mach->mach_params.codec_type = snd_soc_acpi_intel_detect_codec_type(sdev->dev);
+		mach->mach_params.amp_type = snd_soc_acpi_intel_detect_amp_type(sdev->dev);
+
+		dev_info(sdev->dev, "SSP codec %s, amp %s found\n",
+			 snd_soc_acpi_intel_get_codec_name(mach->mach_params.codec_type),
+			 snd_soc_acpi_intel_get_codec_name(mach->mach_params.amp_type));
+
 		/* report to machine driver if any DMICs are found */
 		mach->mach_params.dmic_num = check_dmic_num(sdev);
 
@@ -1427,3 +1435,4 @@ MODULE_IMPORT_NS(SOUNDWIRE_INTEL_INIT);
 MODULE_IMPORT_NS(SOUNDWIRE_INTEL);
 MODULE_IMPORT_NS(SND_SOC_SOF_HDA_MLINK);
 MODULE_IMPORT_NS(SND_SOC_SOF_INTEL_HDA_COMMON);
+MODULE_IMPORT_NS(SND_SOC_ACPI_INTEL_MATCH);

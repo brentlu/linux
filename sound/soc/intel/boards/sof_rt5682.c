@@ -626,7 +626,9 @@ static int sof_audio_probe(struct platform_device *pdev)
 	dev_dbg(&pdev->dev, "sof_rt5682_quirk = %lx\n", sof_rt5682_quirk);
 
 	/* initialize ctx with board quirk */
-	ctx = sof_intel_board_get_ctx(&pdev->dev, sof_rt5682_quirk);
+	ctx = sof_intel_board_get_ctx(&pdev->dev, sof_rt5682_quirk,
+				      mach->mach_params.codec_type,
+				      mach->mach_params.amp_type);
 	if (!ctx)
 		return -ENOMEM;
 

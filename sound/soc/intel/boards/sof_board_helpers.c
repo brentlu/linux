@@ -108,8 +108,8 @@ static int set_ssp_codec_link(struct device *dev, struct snd_soc_dai_link *link,
 {
 	struct snd_soc_dai_link_component *cpus;
 
-	dev_dbg(dev, "link %d: ssp codec %s, ssp %d\n", be_id,
-		snd_soc_acpi_intel_get_codec_name(codec_type), ssp_codec);
+	dev_dbg(dev, "link %d: ssp codec %d, ssp %d\n", be_id, codec_type,
+		ssp_codec);
 
 	/* link name */
 	link->name = devm_kasprintf(dev, GFP_KERNEL, "SSP%d-Codec", ssp_codec);
@@ -264,8 +264,7 @@ static int set_ssp_amp_link(struct device *dev, struct snd_soc_dai_link *link,
 {
 	struct snd_soc_dai_link_component *cpus;
 
-	dev_dbg(dev, "link %d: ssp amp %s, ssp %d\n", be_id,
-		snd_soc_acpi_intel_get_codec_name(amp_type), ssp_amp);
+	dev_dbg(dev, "link %d: ssp amp %d, ssp %d\n", be_id, amp_type, ssp_amp);
 
 	/* link name */
 	link->name = devm_kasprintf(dev, GFP_KERNEL, "SSP%d-Codec", ssp_amp);
@@ -589,7 +588,9 @@ int sof_intel_board_set_dai_link(struct device *dev, struct snd_soc_card *card,
 EXPORT_SYMBOL_NS(sof_intel_board_set_dai_link, SND_SOC_INTEL_SOF_BOARD_HELPERS);
 
 struct sof_card_private *
-sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk)
+sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk,
+			enum snd_soc_acpi_intel_codec codec_type,
+			enum snd_soc_acpi_intel_codec amp_type)
 {
 	struct sof_card_private *ctx;
 
@@ -599,8 +600,8 @@ sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk)
 	if (!ctx)
 		return NULL;
 
-	ctx->codec_type = snd_soc_acpi_intel_detect_codec_type(dev);
-	ctx->amp_type = snd_soc_acpi_intel_detect_amp_type(dev);
+	ctx->codec_type = codec_type;
+	ctx->amp_type = amp_type;
 
 	ctx->dmic_be_num = 2;
 	ctx->hdmi_num = (board_quirk & SOF_NUM_IDISP_HDMI_MASK) >>
@@ -635,4 +636,3 @@ MODULE_DESCRIPTION("ASoC Intel SOF Machine Driver Board Helpers");
 MODULE_AUTHOR("Brent Lu <brent.lu@intel.com>");
 MODULE_LICENSE("GPL");
 MODULE_IMPORT_NS(SND_SOC_INTEL_HDA_DSP_COMMON);
-MODULE_IMPORT_NS(SND_SOC_ACPI_INTEL_MATCH);

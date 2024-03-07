@@ -165,6 +165,8 @@ int sof_intel_board_card_late_probe(struct snd_soc_card *card);
 int sof_intel_board_set_dai_link(struct device *dev, struct snd_soc_card *card,
 				 struct sof_card_private *ctx);
 struct sof_card_private *
-sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk);
+sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk,
+			enum snd_soc_acpi_intel_codec codec_type,
+			enum snd_soc_acpi_intel_codec amp_type);
 
 #endif /* __SOF_INTEL_BOARD_HELPERS_H */

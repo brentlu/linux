@@ -202,5 +202,39 @@ void cs35l41_set_codec_conf(struct snd_soc_card *card)
 }
 EXPORT_SYMBOL_NS(cs35l41_set_codec_conf, SND_SOC_INTEL_SOF_CIRRUS_COMMON);
 
+int
+cirrus_set_dai_link(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		    struct snd_soc_dai_link *amp_link)
+{
+	switch (amp_type) {
+	case CODEC_CS35L41:
+		cs35l41_set_dai_link(amp_link);
+		break;
+	default:
+		dev_err(dev, "invalid amp type %d\n", amp_type);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL_NS(cirrus_set_dai_link, SND_SOC_INTEL_SOF_CIRRUS_COMMON);
+
+int
+cirrus_set_codec_conf(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		      struct snd_soc_card *card)
+{
+	switch (amp_type) {
+	case CODEC_CS35L41:
+		cs35l41_set_codec_conf(card);
+		break;
+	default:
+		dev_err(dev, "invalid amp type %d\n", amp_type);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL_NS(cirrus_set_codec_conf, SND_SOC_INTEL_SOF_CIRRUS_COMMON);
+
 MODULE_DESCRIPTION("ASoC Intel SOF Cirrus Logic helpers");
 MODULE_LICENSE("GPL");

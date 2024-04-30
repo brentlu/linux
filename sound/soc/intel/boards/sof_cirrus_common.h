@@ -23,4 +23,11 @@
 void cs35l41_set_dai_link(struct snd_soc_dai_link *link);
 void cs35l41_set_codec_conf(struct snd_soc_card *card);
 
+int
+cirrus_set_dai_link(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		   struct snd_soc_dai_link *amp_link);
+int
+cirrus_set_codec_conf(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		     struct snd_soc_card *card);
+
 #endif /* __SOF_CIRRUS_COMMON_H */

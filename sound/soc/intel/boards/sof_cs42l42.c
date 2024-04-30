@@ -183,15 +183,14 @@ sof_card_dai_links_create(struct device *dev, struct snd_soc_card *card,
 	}
 
 	/* codec-specific fields for speaker amplifier */
-	switch (ctx->amp_type) {
-	case CODEC_MAX98357A:
-		max_98357a_dai_link(ctx->amp_link);
-		break;
-	case CODEC_MAX98360A:
-		max_98360a_dai_link(ctx->amp_link);
+	switch (ctx->amp_vendor) {
+	case CODEC_VENDOR_MAXIM:
+		ret = maxim_set_dai_link(dev, ctx->amp_type, ctx->amp_link);
+		if (ret)
+			return ret;
 		break;
 	default:
-		dev_err(dev, "invalid amp type %d\n", ctx->amp_type);
+		dev_err(dev, "invalid amp vendor %d\n", ctx->amp_vendor);
 		return -EINVAL;
 	}
 
@@ -236,6 +235,22 @@ static int sof_audio_probe(struct platform_device *pdev)
 	ret = sof_card_dai_links_create(&pdev->dev, &sof_audio_card_cs42l42, ctx);
 	if (ret)
 		return ret;
+
+	/* update codec_conf */
+	switch (ctx->amp_vendor) {
+	case CODEC_VENDOR_MAXIM:
+		ret = maxim_set_codec_conf(&pdev->dev, ctx->amp_type,
+					   &sof_audio_card_cs42l42);
+		if (ret)
+			return ret;
+		break;
+	default:
+		if (ctx->amp_type == CODEC_NONE)
+			break;
+
+		dev_err(&pdev->dev, "invalid amp vendor %d\n", ctx->amp_vendor);
+		return -EINVAL;
+	}
 
 	sof_audio_card_cs42l42.dev = &pdev->dev;
 

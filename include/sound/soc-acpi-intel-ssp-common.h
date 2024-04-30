@@ -65,6 +65,17 @@ enum snd_soc_acpi_intel_codec {
 	CODEC_RT1308,
 };
 
+enum snd_soc_acpi_intel_codec_vendor {
+	CODEC_VENDOR_UNKNOWN,
+
+	CODEC_VENDOR_CIRRUS_LOGIC,
+	CODEC_VENDOR_DIALOG,
+	CODEC_VENDOR_EVEREST,
+	CODEC_VENDOR_MAXIM,
+	CODEC_VENDOR_NUVOTON,
+	CODEC_VENDOR_REALTEK,
+};
+
 enum snd_soc_acpi_intel_codec
 snd_soc_acpi_intel_detect_codec_type(struct device *dev);
 enum snd_soc_acpi_intel_codec
@@ -77,5 +88,8 @@ const char *
 snd_soc_acpi_intel_get_codec_tplg_suffix(enum snd_soc_acpi_intel_codec codec_type);
 const char *
 snd_soc_acpi_intel_get_amp_tplg_suffix(enum snd_soc_acpi_intel_codec codec_type);
+
+enum snd_soc_acpi_intel_codec_vendor
+snd_soc_acpi_intel_get_codec_vendor(enum snd_soc_acpi_intel_codec codec_type);
 
 #endif /* __LINUX_SND_SOC_ACPI_INTEL_SSP_COMMON_H */

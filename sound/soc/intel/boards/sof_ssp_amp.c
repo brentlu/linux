@@ -93,15 +93,19 @@ sof_card_dai_links_create(struct device *dev, struct snd_soc_card *card,
 	}
 
 	/* codec-specific fields for speaker amplifier */
-	switch (ctx->amp_type) {
-	case CODEC_CS35L41:
-		cs35l41_set_dai_link(ctx->amp_link);
+	switch (ctx->amp_vendor) {
+	case CODEC_VENDOR_CIRRUS_LOGIC:
+		ret = cirrus_set_dai_link(dev, ctx->amp_type, ctx->amp_link);
+		if (ret)
+			return ret;
 		break;
-	case CODEC_RT1308:
-		sof_rt1308_dai_link(ctx->amp_link);
+	case CODEC_VENDOR_REALTEK:
+		ret = realtek_set_dai_link(dev, ctx->amp_type, ctx->amp_link);
+		if (ret)
+			return ret;
 		break;
 	default:
-		dev_err(dev, "invalid amp type %d\n", ctx->amp_type);
+		dev_err(dev, "invalid amp vendor %d\n", ctx->amp_vendor);
 		return -EINVAL;
 	}
 
@@ -148,16 +152,24 @@ static int sof_ssp_amp_probe(struct platform_device *pdev)
 		return ret;
 
 	/* update codec_conf */
-	switch (ctx->amp_type) {
-	case CODEC_CS35L41:
-		cs35l41_set_codec_conf(&sof_ssp_amp_card);
+	switch (ctx->amp_vendor) {
+	case CODEC_VENDOR_CIRRUS_LOGIC:
+		ret = cirrus_set_codec_conf(&pdev->dev, ctx->amp_type,
+					    &sof_ssp_amp_card);
+		if (ret)
+			return ret;
 		break;
-	case CODEC_RT1308:
-	case CODEC_NONE:
-		/* no codec conf required */
+	case CODEC_VENDOR_REALTEK:
+		ret = realtek_set_codec_conf(&pdev->dev, ctx->amp_type,
+					     &sof_ssp_amp_card);
+		if (ret)
+			return ret;
 		break;
 	default:
-		dev_err(&pdev->dev, "invalid amp type %d\n", ctx->amp_type);
+		if (ctx->amp_type == CODEC_NONE)
+			break;
+
+		dev_err(&pdev->dev, "invalid amp vendor %d\n", ctx->amp_vendor);
 		return -EINVAL;
 	}
 

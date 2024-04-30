@@ -583,40 +583,28 @@ sof_card_dai_links_create(struct device *dev, struct snd_soc_card *card,
 	}
 
 	/* codec-specific fields for speaker amplifier */
-	switch (ctx->amp_type) {
-	case CODEC_MAX98357A:
-		max_98357a_dai_link(ctx->amp_link);
+	switch (ctx->amp_vendor) {
+	case CODEC_VENDOR_MAXIM:
+		ret = maxim_set_dai_link(dev, ctx->amp_type, ctx->amp_link);
+		if (ret)
+			return ret;
 		break;
-	case CODEC_MAX98360A:
-		max_98360a_dai_link(ctx->amp_link);
-		break;
-	case CODEC_MAX98373:
-		max_98373_dai_link(dev, ctx->amp_link);
-		break;
-	case CODEC_MAX98390:
-		max_98390_dai_link(dev, ctx->amp_link);
-		break;
-	case CODEC_RT1011:
-		sof_rt1011_dai_link(dev, ctx->amp_link);
-		break;
-	case CODEC_RT1015:
-		sof_rt1015_dai_link(ctx->amp_link);
-		break;
-	case CODEC_RT1015P:
-		sof_rt1015p_dai_link(ctx->amp_link);
-		break;
-	case CODEC_RT1019P:
-		sof_rt1019p_dai_link(ctx->amp_link);
-		break;
-	case CODEC_RT5650:
-		/* use AIF2 to support speaker pipeline */
-		ctx->amp_link->codecs = &rt5650_components[1];
-		ctx->amp_link->num_codecs = 1;
-		ctx->amp_link->init = rt5650_spk_init;
-		ctx->amp_link->ops = &sof_rt5682_ops;
+	case CODEC_VENDOR_REALTEK:
+		if (ctx->amp_type == CODEC_RT5650) {
+			/* use AIF2 to support speaker pipeline */
+			ctx->amp_link->codecs = &rt5650_components[1];
+			ctx->amp_link->num_codecs = 1;
+			ctx->amp_link->init = rt5650_spk_init;
+			ctx->amp_link->ops = &sof_rt5682_ops;
+		} else {
+			ret = realtek_set_dai_link(dev, ctx->amp_type,
+						   ctx->amp_link);
+			if (ret)
+				return ret;
+		}
 		break;
 	default:
-		dev_err(dev, "invalid amp type %d\n", ctx->amp_type);
+		dev_err(dev, "invalid amp vendor %d\n", ctx->amp_vendor);
 		return -EINVAL;
 	}
 
@@ -736,31 +724,26 @@ static int sof_audio_probe(struct platform_device *pdev)
 		return ret;
 
 	/* update codec_conf */
-	switch (ctx->amp_type) {
-	case CODEC_MAX98373:
-		max_98373_set_codec_conf(&sof_audio_card_rt5682);
+	switch (ctx->amp_vendor) {
+	case CODEC_VENDOR_MAXIM:
+		ret = maxim_set_codec_conf(&pdev->dev, ctx->amp_type,
+					   &sof_audio_card_rt5682);
+		if (ret)
+			return ret;
 		break;
-	case CODEC_MAX98390:
-		max_98390_set_codec_conf(&pdev->dev, &sof_audio_card_rt5682);
-		break;
-	case CODEC_RT1011:
-		sof_rt1011_codec_conf(&pdev->dev, &sof_audio_card_rt5682);
-		break;
-	case CODEC_RT1015:
-		sof_rt1015_codec_conf(&sof_audio_card_rt5682);
-		break;
-	case CODEC_RT1015P:
-		sof_rt1015p_codec_conf(&sof_audio_card_rt5682);
-		break;
-	case CODEC_MAX98357A:
-	case CODEC_MAX98360A:
-	case CODEC_RT1019P:
-	case CODEC_RT5650:
-	case CODEC_NONE:
-		/* no codec conf required */
+	case CODEC_VENDOR_REALTEK:
+		if (ctx->amp_type != CODEC_RT5650) {
+			ret = realtek_set_codec_conf(&pdev->dev, ctx->amp_type,
+						     &sof_audio_card_rt5682);
+			if (ret)
+				return ret;
+		}
 		break;
 	default:
-		dev_err(&pdev->dev, "invalid amp type %d\n", ctx->amp_type);
+		if (ctx->amp_type == CODEC_NONE)
+			break;
+
+		dev_err(&pdev->dev, "invalid amp vendor %d\n", ctx->amp_vendor);
 		return -EINVAL;
 	}
 

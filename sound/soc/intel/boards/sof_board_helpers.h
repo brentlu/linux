@@ -116,6 +116,7 @@ struct sof_rt5682_private {
  * @hdmi: init data for hdmi dai link
  * @codec_type: type of headset codec
  * @amp_type: type of speaker amplifier
+ * @amp_vendor: vendor of speaker amplifier
  * @dmic_be_num: number of Intel PCH DMIC BE link
  * @hdmi_num: number of Intel HDMI BE link
  * @ssp_codec: ssp port number of headphone BE link
@@ -136,6 +137,7 @@ struct sof_card_private {
 
 	enum snd_soc_acpi_intel_codec codec_type;
 	enum snd_soc_acpi_intel_codec amp_type;
+	enum snd_soc_acpi_intel_codec_vendor amp_vendor;
 
 	int dmic_be_num;
 	int hdmi_num;

@@ -601,6 +601,7 @@ sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk)
 
 	ctx->codec_type = snd_soc_acpi_intel_detect_codec_type(dev);
 	ctx->amp_type = snd_soc_acpi_intel_detect_amp_type(dev);
+	ctx->amp_vendor = snd_soc_acpi_intel_get_codec_vendor(ctx->amp_type);
 
 	ctx->dmic_be_num = 2;
 	ctx->hdmi_num = (board_quirk & SOF_NUM_IDISP_HDMI_MASK) >>

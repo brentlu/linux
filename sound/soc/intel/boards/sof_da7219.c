@@ -214,6 +214,19 @@ static const struct snd_soc_ops max98373_ops = {
 
 static int card_late_probe(struct snd_soc_card *card)
 {
+	struct sof_card_private *ctx = snd_soc_card_get_drvdata(card);
+	struct snd_soc_dapm_context *dapm = &card->dapm;
+	int err;
+
+	if (!ctx->da7219.is_jsl_board && ctx->amp_type == CODEC_MAX98373) {
+		/* Disable Left and Right Spk pin after boot */
+		snd_soc_dapm_disable_pin(dapm, "Left Spk");
+		snd_soc_dapm_disable_pin(dapm, "Right Spk");
+		err = snd_soc_dapm_sync(dapm);
+		if (err < 0)
+			return err;
+	}
+
 	return sof_intel_board_card_late_probe(card);
 }
 
@@ -267,28 +280,17 @@ sof_card_dai_links_create(struct device *dev, struct snd_soc_card *card,
 	}
 
 	/* codec-specific fields for speaker amplifier */
-	switch (ctx->amp_type) {
-	case CODEC_MAX98357A:
-		max_98357a_dai_link(ctx->amp_link);
-		break;
-	case CODEC_MAX98360A:
-		max_98360a_dai_link(ctx->amp_link);
-		break;
-	case CODEC_MAX98373:
-		if (ctx->da7219.is_jsl_board) {
-			max_98373_dai_link(dev, ctx->amp_link);
+	switch (ctx->amp_vendor) {
+	case CODEC_VENDOR_MAXIM:
+		ret = maxim_set_dai_link(dev, ctx->amp_type, ctx->amp_link);
+		if (ret)
+			return ret;
+
+		if (ctx->da7219.is_jsl_board && ctx->amp_type == CODEC_MAX98373)
 			ctx->amp_link->ops = &max98373_ops; /* use local ops */
-		} else {
-			/* TBD: implement the amp for later platform */
-			dev_err(dev, "max98373 not support yet\n");
-			return -EINVAL;
-		}
-		break;
-	case CODEC_MAX98390:
-		max_98390_dai_link(dev, ctx->amp_link);
 		break;
 	default:
-		dev_err(dev, "invalid amp type %d\n", ctx->amp_type);
+		dev_err(dev, "invalid amp vendor %d\n", ctx->amp_vendor);
 		return -EINVAL;
 	}
 
@@ -424,20 +426,18 @@ static int audio_probe(struct platform_device *pdev)
 		return ret;
 
 	/* update codec_conf */
-	switch (ctx->amp_type) {
-	case CODEC_MAX98373:
-		max_98373_set_codec_conf(&card_da7219);
-		break;
-	case CODEC_MAX98390:
-		max_98390_set_codec_conf(&pdev->dev, &card_da7219);
-		break;
-	case CODEC_MAX98357A:
-	case CODEC_MAX98360A:
-	case CODEC_NONE:
-		/* no codec conf required */
+	switch (ctx->amp_vendor) {
+	case CODEC_VENDOR_MAXIM:
+		ret = maxim_set_codec_conf(&pdev->dev, ctx->amp_type,
+					   &card_da7219);
+		if (ret)
+			return ret;
 		break;
 	default:
-		dev_err(&pdev->dev, "invalid amp type %d\n", ctx->amp_type);
+		if (ctx->amp_type == CODEC_NONE)
+			break;
+
+		dev_err(&pdev->dev, "invalid amp vendor %d\n", ctx->amp_vendor);
 		return -EINVAL;
 	}
 

@@ -683,5 +683,61 @@ void sof_rt1019p_dai_link(struct snd_soc_dai_link *link)
 }
 EXPORT_SYMBOL_NS(sof_rt1019p_dai_link, SND_SOC_INTEL_SOF_REALTEK_COMMON);
 
+int
+realtek_set_dai_link(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		     struct snd_soc_dai_link *amp_link)
+{
+	switch (amp_type) {
+	case CODEC_RT1011:
+		sof_rt1011_dai_link(dev, amp_link);
+		break;
+	case CODEC_RT1015:
+		sof_rt1015_dai_link(amp_link);
+		break;
+	case CODEC_RT1015P:
+		sof_rt1015p_dai_link(amp_link);
+		break;
+	case CODEC_RT1019P:
+		sof_rt1019p_dai_link(amp_link);
+		break;
+	case CODEC_RT1308:
+		sof_rt1308_dai_link(amp_link);
+		break;
+	default:
+		dev_err(dev, "invalid amp type %d\n", amp_type);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL_NS(realtek_set_dai_link, SND_SOC_INTEL_SOF_REALTEK_COMMON);
+
+int
+realtek_set_codec_conf(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		       struct snd_soc_card *card)
+{
+	switch (amp_type) {
+	case CODEC_RT1011:
+		sof_rt1011_codec_conf(dev, card);
+		break;
+	case CODEC_RT1015:
+		sof_rt1015_codec_conf(card);
+		break;
+	case CODEC_RT1015P:
+		sof_rt1015p_codec_conf(card);
+		break;
+	case CODEC_RT1019P:
+	case CODEC_RT1308:
+		/* no codec conf required */
+		break;
+	default:
+		dev_err(dev, "invalid amp type %d\n", amp_type);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL_NS(realtek_set_codec_conf, SND_SOC_INTEL_SOF_REALTEK_COMMON);
+
 MODULE_DESCRIPTION("ASoC Intel SOF Realtek helpers");
 MODULE_LICENSE("GPL");

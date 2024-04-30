@@ -60,4 +60,9 @@ void sof_rt1308_dai_link(struct snd_soc_dai_link *link);
 
 void sof_rt1019p_dai_link(struct snd_soc_dai_link *link);
 
+int realtek_set_dai_link(struct device *dev, enum snd_soc_acpi_intel_codec type,
+			 struct snd_soc_dai_link *amp_link);
+int realtek_set_codec_conf(struct device *dev, enum snd_soc_acpi_intel_codec type,
+			   struct snd_soc_card *card);
+
 #endif /* __SOF_REALTEK_COMMON_H */

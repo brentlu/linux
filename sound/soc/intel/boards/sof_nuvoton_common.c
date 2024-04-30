@@ -69,5 +69,39 @@ void nau8318_set_dai_link(struct snd_soc_dai_link *link)
 }
 EXPORT_SYMBOL_NS(nau8318_set_dai_link, SND_SOC_INTEL_SOF_NUVOTON_COMMON);
 
+int
+nuvoton_set_dai_link(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		     struct snd_soc_dai_link *amp_link)
+{
+	switch (amp_type) {
+	case CODEC_NAU8318:
+		nau8318_set_dai_link(amp_link);
+		break;
+	default:
+		dev_err(dev, "invalid amp type %d\n", amp_type);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL_NS(nuvoton_set_dai_link, SND_SOC_INTEL_SOF_NUVOTON_COMMON);
+
+int
+nuvoton_set_codec_conf(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		       struct snd_soc_card *card)
+{
+	switch (amp_type) {
+	case CODEC_NAU8318:
+		/* no codec conf required */
+		break;
+	default:
+		dev_err(dev, "invalid amp type %d\n", amp_type);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL_NS(nuvoton_set_codec_conf, SND_SOC_INTEL_SOF_NUVOTON_COMMON);
+
 MODULE_DESCRIPTION("ASoC Intel SOF Nuvoton helpers");
 MODULE_LICENSE("GPL");

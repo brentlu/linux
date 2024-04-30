@@ -19,4 +19,9 @@
 
 void nau8318_set_dai_link(struct snd_soc_dai_link *link);
 
+int nuvoton_set_dai_link(struct device *dev, enum snd_soc_acpi_intel_codec type,
+			 struct snd_soc_dai_link *amp_link);
+int nuvoton_set_codec_conf(struct device *dev, enum snd_soc_acpi_intel_codec type,
+			   struct snd_soc_card *card);
+
 #endif /* __SOF_NUVOTON_COMMON_H */

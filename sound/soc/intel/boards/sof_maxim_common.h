@@ -45,4 +45,11 @@ void max_98390_set_codec_conf(struct device *dev, struct snd_soc_card *card);
 void max_98357a_dai_link(struct snd_soc_dai_link *link);
 void max_98360a_dai_link(struct snd_soc_dai_link *link);
 
+int
+maxim_set_dai_link(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		   struct snd_soc_dai_link *amp_link);
+int
+maxim_set_codec_conf(struct device *dev, enum snd_soc_acpi_intel_codec amp_type,
+		     struct snd_soc_card *card);
+
 #endif /* __SOF_MAXIM_COMMON_H */

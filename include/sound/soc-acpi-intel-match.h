@@ -51,6 +51,9 @@ extern struct snd_soc_acpi_mach snd_soc_acpi_intel_ptl_sdw_machines[];
  * generic table used for HDA codec-based platforms, possibly with
  * additional ACPI-enumerated codecs
  */
+#define SND_SOC_ACPI_INTEL_HDA_MACH_SKL	0
+#define SND_SOC_ACPI_INTEL_HDA_MACH_SOF	1
+
 extern struct snd_soc_acpi_mach snd_soc_acpi_intel_hda_machines[];
 
 #endif

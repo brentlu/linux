@@ -477,7 +477,7 @@ static struct snd_soc_acpi_mach *skl_find_hda_machine(struct skl_dev *skl,
 	struct snd_soc_acpi_mach *mach;
 
 	/* point to common table */
-	mach = snd_soc_acpi_intel_hda_machines;
+	mach = &snd_soc_acpi_intel_hda_machines[SND_SOC_ACPI_INTEL_HDA_MACH_SKL];
 
 	/* all entries in the machine table use the same firmware */
 	mach->fw_filename = machines->fw_filename;

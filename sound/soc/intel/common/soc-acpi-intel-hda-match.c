@@ -33,7 +33,8 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_hda_machines[] = {
 	[SND_SOC_ACPI_INTEL_HDA_MACH_SOF] = {
 		/* SOF HDA machine driver */
 		.drv_name = "skl_hda_dsp_generic",
-		.sof_tplg_filename = "sof-hda-generic.tplg",
+		.sof_tplg_filename = "sof-hda-generic", /* the tplg suffix is added at run time */
+		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_DMIC_NUMBER,
 	},
 	{},
 };

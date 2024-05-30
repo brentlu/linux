@@ -15,7 +15,7 @@ static struct skl_machine_pdata hda_pdata = {
 };
 
 struct snd_soc_acpi_mach snd_soc_acpi_intel_hda_machines[] = {
-	{
+	[SND_SOC_ACPI_INTEL_HDA_MACH_SKL] ={
 		/* .id is not used in this file */
 		.drv_name = "skl_hda_dsp_generic",
 
@@ -29,6 +29,11 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_hda_machines[] = {
 		 * combining HDA+other device (e.g. DMIC).
 		 */
 		.pdata = &hda_pdata,
+	},
+	[SND_SOC_ACPI_INTEL_HDA_MACH_SOF] ={
+		/* SOF HDA machine driver */
+		.drv_name = "skl_hda_dsp_generic",
+		.sof_tplg_filename = "sof-hda-generic.tplg",
 	},
 	{},
 };

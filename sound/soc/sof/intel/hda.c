@@ -562,7 +562,6 @@ static int check_nhlt_ssp_mclk_mask(struct snd_sof_dev *sdev, int ssp_num)
 
 static const char *fixup_tplg_name(struct snd_sof_dev *sdev,
 				   const char *sof_tplg_filename,
-				   const char *idisp_str,
 				   const char *dmic_str)
 {
 	const char *tplg_filename = NULL;
@@ -578,8 +577,8 @@ static const char *fixup_tplg_name(struct snd_sof_dev *sdev,
 	split_ext = strsep(&tmp, ".");
 	if (split_ext)
 		tplg_filename = devm_kasprintf(sdev->dev, GFP_KERNEL,
-					       "%s%s%s.tplg",
-					       split_ext, idisp_str, dmic_str);
+					       "%s%s.tplg",
+					       split_ext, dmic_str);
 	kfree(filename);
 
 	return tplg_filename;
@@ -587,7 +586,6 @@ static const char *fixup_tplg_name(struct snd_sof_dev *sdev,
 
 static int dmic_detect_topology_fixup(struct snd_sof_dev *sdev,
 				      const char **tplg_filename,
-				      const char *idisp_str,
 				      int *dmic_found,
 				      bool tplg_fixup)
 {
@@ -621,7 +619,7 @@ static int dmic_detect_topology_fixup(struct snd_sof_dev *sdev,
 		const char *fixed_tplg_filename;
 
 		fixed_tplg_filename = fixup_tplg_name(sdev, default_tplg_filename,
-						      idisp_str, dmic_str);
+						      dmic_str);
 		if (!fixed_tplg_filename)
 			return -ENOMEM;
 		*tplg_filename = fixed_tplg_filename;
@@ -1216,7 +1214,7 @@ static struct snd_soc_acpi_mach *hda_sdw_machine_select(struct snd_sof_dev *sdev
 		if (hweight_long(mach->link_mask) <= 2) {
 			int ret;
 
-			ret = dmic_detect_topology_fixup(sdev, &tplg_filename, "",
+			ret = dmic_detect_topology_fixup(sdev, &tplg_filename,
 							 &dmic_num, tplg_fixup);
 			if (ret < 0)
 				return NULL;

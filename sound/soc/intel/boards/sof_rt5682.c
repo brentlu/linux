@@ -662,7 +662,7 @@ static int sof_audio_probe(struct platform_device *pdev)
 			ctx->amp_type = CODEC_RT5650;
 	}
 
-	if (mach->mach_params.codec_mask & IDISP_CODEC_MASK)
+	if (mach->mach_params.hda.codec_mask & IDISP_CODEC_MASK)
 		ctx->hdmi.idisp_codec = true;
 
 	if (soc_intel_is_byt() || soc_intel_is_cht()) {

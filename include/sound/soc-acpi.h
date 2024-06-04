@@ -56,6 +56,37 @@ static inline struct snd_soc_acpi_mach *snd_soc_acpi_codec_list(void *arg)
 #endif
 
 /**
+ * snd_soc_acpi_hda_mach_params: parameters related to HDA bus
+ *
+ * @codec_mask: used for HDAudio support
+ * @common_hdmi_codec_drv: use commom HDAudio HDMI codec driver
+ */
+struct snd_soc_acpi_hda_mach_params {
+	u32 codec_mask;
+	bool common_hdmi_codec_drv;
+};
+
+/**
+ * snd_soc_acpi_i2s_mach_params: parameters related to I2S bus
+ *
+ * @link_mask: I2S/TDM links enabled on the board
+ */
+struct snd_soc_acpi_i2s_mach_params {
+	u32 link_mask;
+};
+
+/**
+ * snd_soc_acpi_sdw_mach_params: parameters related to SDW bus
+ *
+ * @link_mask: SoundWire links enabled on the board
+ * @links: array of SoundWire link _ADR descriptors, null terminated
+ */
+struct snd_soc_acpi_sdw_mach_params {
+	u32 link_mask;
+	const struct snd_soc_acpi_link_adr *links;
+};
+
+/**
  * snd_soc_acpi_mach_params: interface for machine driver configuration
  *
  * @acpi_ipc_irq_index: used for BYT-CR detection
@@ -72,6 +103,9 @@ static inline struct snd_soc_acpi_mach *snd_soc_acpi_codec_list(void *arg)
  * @subsystem_device: optional PCI SSID device value
  * @subsystem_id_set: true if a value has been written to
  *		      subsystem_vendor and subsystem_device.
+ * @hda: parameters related to HDA bus
+ * @i2s: parameters related to I2S bus
+ * @sdw: parameters related to SDW bus
  */
 struct snd_soc_acpi_mach_params {
 	u32 acpi_ipc_irq_index;
@@ -87,6 +121,12 @@ struct snd_soc_acpi_mach_params {
 	unsigned short subsystem_vendor;
 	unsigned short subsystem_device;
 	bool subsystem_id_set;
+
+	struct snd_soc_acpi_hda_mach_params hda;
+	union {
+		struct snd_soc_acpi_i2s_mach_params i2s;
+		struct snd_soc_acpi_sdw_mach_params sdw;
+	};
 };
 
 /**

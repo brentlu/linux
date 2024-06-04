@@ -75,7 +75,7 @@ static struct snd_soc_acpi_mach avs_skl_i2s_machines[] = {
 		.id = "INT343A",
 		.drv_name = "avs_rt286",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "rt286-tplg.bin",
 	},
@@ -83,7 +83,7 @@ static struct snd_soc_acpi_mach avs_skl_i2s_machines[] = {
 		.id = "10508825",
 		.drv_name = "avs_nau8825",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(1),
+			.i2s.link_mask = AVS_SSP(1),
 		},
 		.tplg_filename = "nau8825-tplg.bin",
 	},
@@ -91,7 +91,7 @@ static struct snd_soc_acpi_mach avs_skl_i2s_machines[] = {
 		.id = "INT343B",
 		.drv_name = "avs_ssm4567",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "ssm4567-tplg.bin",
 	},
@@ -99,7 +99,7 @@ static struct snd_soc_acpi_mach avs_skl_i2s_machines[] = {
 		.id = "MX98357A",
 		.drv_name = "avs_max98357a",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "max98357a-tplg.bin",
 	},
@@ -111,7 +111,7 @@ static struct snd_soc_acpi_mach avs_kbl_i2s_machines[] = {
 		.id = "INT343A",
 		.drv_name = "avs_rt286",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.quirk_data = &kbl_dmi_table,
 		.machine_quirk = dmi_match_quirk,
@@ -121,7 +121,7 @@ static struct snd_soc_acpi_mach avs_kbl_i2s_machines[] = {
 		.id = "INT343A",
 		.drv_name = "avs_rt298",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.quirk_data = &kblr_dmi_table,
 		.machine_quirk = dmi_match_quirk,
@@ -131,7 +131,7 @@ static struct snd_soc_acpi_mach avs_kbl_i2s_machines[] = {
 		.id = "MX98927",
 		.drv_name = "avs_max98927",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "max98927-tplg.bin",
 	},
@@ -139,7 +139,7 @@ static struct snd_soc_acpi_mach avs_kbl_i2s_machines[] = {
 		.id = "10EC5514",
 		.drv_name = "avs_rt5514",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.pdata = (unsigned long[]){ 0x2, 0, 0, 0, 0, 0 }, /* SSP0 TDMs */
 		.tplg_filename = "rt5514-tplg.bin",
@@ -148,7 +148,7 @@ static struct snd_soc_acpi_mach avs_kbl_i2s_machines[] = {
 		.id = "10EC5663",
 		.drv_name = "avs_rt5663",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(1),
+			.i2s.link_mask = AVS_SSP(1),
 		},
 		.tplg_filename = "rt5663-tplg.bin",
 	},
@@ -156,7 +156,7 @@ static struct snd_soc_acpi_mach avs_kbl_i2s_machines[] = {
 		.id = "MX98373",
 		.drv_name = "avs_max98373",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "max98373-tplg.bin",
 	},
@@ -164,7 +164,7 @@ static struct snd_soc_acpi_mach avs_kbl_i2s_machines[] = {
 		.id = "MX98357A",
 		.drv_name = "avs_max98357a",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "max98357a-tplg.bin",
 	},
@@ -172,7 +172,7 @@ static struct snd_soc_acpi_mach avs_kbl_i2s_machines[] = {
 		.id = "DLGS7219",
 		.drv_name = "avs_da7219",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(1),
+			.i2s.link_mask = AVS_SSP(1),
 		},
 		.tplg_filename = "da7219-tplg.bin",
 	},
@@ -180,7 +180,7 @@ static struct snd_soc_acpi_mach avs_kbl_i2s_machines[] = {
 		.id = "ESSX8336",
 		.drv_name = "avs_es8336",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "es8336-tplg.bin",
 	},
@@ -192,7 +192,7 @@ static struct snd_soc_acpi_mach avs_apl_i2s_machines[] = {
 		.id = "INT343A",
 		.drv_name = "avs_rt298",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(5),
+			.i2s.link_mask = AVS_SSP(5),
 		},
 		.tplg_filename = "rt298-tplg.bin",
 	},
@@ -200,7 +200,7 @@ static struct snd_soc_acpi_mach avs_apl_i2s_machines[] = {
 		.id = "INT34C3",
 		.drv_name = "avs_tdf8532",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP_RANGE(0, 5),
+			.i2s.link_mask = AVS_SSP_RANGE(0, 5),
 		},
 		.pdata = (unsigned long[]){ 0x1, 0x1, 0x14, 0x1, 0x1, 0x1 }, /* SSP2 TDMs */
 		.tplg_filename = "tdf8532-tplg.bin",
@@ -209,7 +209,7 @@ static struct snd_soc_acpi_mach avs_apl_i2s_machines[] = {
 		.id = "MX98357A",
 		.drv_name = "avs_max98357a",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(5),
+			.i2s.link_mask = AVS_SSP(5),
 		},
 		.tplg_filename = "max98357a-tplg.bin",
 	},
@@ -217,7 +217,7 @@ static struct snd_soc_acpi_mach avs_apl_i2s_machines[] = {
 		.id = "DLGS7219",
 		.drv_name = "avs_da7219",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(1),
+			.i2s.link_mask = AVS_SSP(1),
 		},
 		.tplg_filename = "da7219-tplg.bin",
 	},
@@ -229,7 +229,7 @@ static struct snd_soc_acpi_mach avs_gml_i2s_machines[] = {
 		.id = "INT343A",
 		.drv_name = "avs_rt298",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(2),
+			.i2s.link_mask = AVS_SSP(2),
 		},
 		.tplg_filename = "rt298-tplg.bin",
 	},
@@ -241,7 +241,7 @@ static struct snd_soc_acpi_mach avs_cnl_i2s_machines[] = {
 		.id = "INT34C2",
 		.drv_name = "avs_rt274",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "rt274-tplg.bin",
 	},
@@ -249,7 +249,7 @@ static struct snd_soc_acpi_mach avs_cnl_i2s_machines[] = {
 		.id = "10EC5682",
 		.drv_name = "avs_rt5682",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(1),
+			.i2s.link_mask = AVS_SSP(1),
 		},
 		.tplg_filename = "rt5682-tplg.bin",
 	},
@@ -261,7 +261,7 @@ static struct snd_soc_acpi_mach avs_icl_i2s_machines[] = {
 		.id = "INT343A",
 		.drv_name = "avs_rt298",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "rt298-tplg.bin",
 	},
@@ -269,7 +269,7 @@ static struct snd_soc_acpi_mach avs_icl_i2s_machines[] = {
 		.id = "INT34C2",
 		.drv_name = "avs_rt274",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "rt274-tplg.bin",
 	},
@@ -281,7 +281,7 @@ static struct snd_soc_acpi_mach avs_tgl_i2s_machines[] = {
 		.id = "INT34C2",
 		.drv_name = "avs_rt274",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "rt274-tplg.bin",
 	},
@@ -289,7 +289,7 @@ static struct snd_soc_acpi_mach avs_tgl_i2s_machines[] = {
 		.id = "10EC0298",
 		.drv_name = "avs_rt298",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "rt298-tplg.bin",
 	},
@@ -297,7 +297,7 @@ static struct snd_soc_acpi_mach avs_tgl_i2s_machines[] = {
 		.id = "10EC1308",
 		.drv_name = "avs_rt1308",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(1),
+			.i2s.link_mask = AVS_SSP(1),
 		},
 		.tplg_filename = "rt1308-tplg.bin",
 	},
@@ -305,7 +305,7 @@ static struct snd_soc_acpi_mach avs_tgl_i2s_machines[] = {
 		.id = "ESSX8336",
 		.drv_name = "avs_es8336",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "es8336-tplg.bin",
 	},
@@ -316,42 +316,42 @@ static struct snd_soc_acpi_mach avs_test_i2s_machines[] = {
 	{
 		.drv_name = "avs_i2s_test",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(0),
+			.i2s.link_mask = AVS_SSP(0),
 		},
 		.tplg_filename = "i2s-test-tplg.bin",
 	},
 	{
 		.drv_name = "avs_i2s_test",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(1),
+			.i2s.link_mask = AVS_SSP(1),
 		},
 		.tplg_filename = "i2s-test-tplg.bin",
 	},
 	{
 		.drv_name = "avs_i2s_test",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(2),
+			.i2s.link_mask = AVS_SSP(2),
 		},
 		.tplg_filename = "i2s-test-tplg.bin",
 	},
 	{
 		.drv_name = "avs_i2s_test",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(3),
+			.i2s.link_mask = AVS_SSP(3),
 		},
 		.tplg_filename = "i2s-test-tplg.bin",
 	},
 	{
 		.drv_name = "avs_i2s_test",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(4),
+			.i2s.link_mask = AVS_SSP(4),
 		},
 		.tplg_filename = "i2s-test-tplg.bin",
 	},
 	{
 		.drv_name = "avs_i2s_test",
 		.mach_params = {
-			.i2s_link_mask = AVS_SSP(5),
+			.i2s.link_mask = AVS_SSP(5),
 		},
 		.tplg_filename = "i2s-test-tplg.bin",
 	},
@@ -482,25 +482,25 @@ static int avs_register_i2s_board(struct avs_dev *adev, struct snd_soc_acpi_mach
 	int ret;
 
 	num_ssps = adev->hw_cfg.i2s_caps.ctrl_count;
-	if (fls(mach->mach_params.i2s_link_mask) > num_ssps) {
+	if (fls(mach->mach_params.i2s.link_mask) > num_ssps) {
 		dev_err(adev->dev, "Platform supports %d SSPs but board %s requires SSP%ld\n",
 			num_ssps, mach->drv_name,
-			(unsigned long)__fls(mach->mach_params.i2s_link_mask));
+			(unsigned long)__fls(mach->mach_params.i2s.link_mask));
 		return -ENODEV;
 	}
 
 	name = devm_kasprintf(adev->dev, GFP_KERNEL, "%s.%d-platform", mach->drv_name,
-			      mach->mach_params.i2s_link_mask);
+			      mach->mach_params.i2s.link_mask);
 	if (!name)
 		return -ENOMEM;
 
-	ret = avs_i2s_platform_register(adev, name, mach->mach_params.i2s_link_mask, mach->pdata);
+	ret = avs_i2s_platform_register(adev, name, mach->mach_params.i2s.link_mask, mach->pdata);
 	if (ret < 0)
 		return ret;
 
 	mach->mach_params.platform = name;
 
-	board = platform_device_register_data(NULL, mach->drv_name, mach->mach_params.i2s_link_mask,
+	board = platform_device_register_data(NULL, mach->drv_name, mach->mach_params.i2s.link_mask,
 					      (const void *)mach, sizeof(*mach));
 	if (IS_ERR(board)) {
 		dev_err(adev->dev, "ssp board register failed\n");

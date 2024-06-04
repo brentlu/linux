@@ -13,12 +13,12 @@
 
 static inline bool avs_mach_singular_ssp(struct snd_soc_acpi_mach *mach)
 {
-	return hweight_long(mach->mach_params.i2s_link_mask) == 1;
+	return hweight_long(mach->mach_params.i2s.link_mask) == 1;
 }
 
 static inline u32 avs_mach_ssp_port(struct snd_soc_acpi_mach *mach)
 {
-	return __ffs(mach->mach_params.i2s_link_mask);
+	return __ffs(mach->mach_params.i2s.link_mask);
 }
 
 static inline bool avs_mach_singular_tdm(struct snd_soc_acpi_mach *mach, u32 port)

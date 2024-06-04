@@ -309,7 +309,7 @@ static int audio_probe(struct platform_device *pdev)
 	if (!ctx)
 		return -ENOMEM;
 
-	if (mach->mach_params.codec_mask & IDISP_CODEC_MASK)
+	if (mach->mach_params.hda.codec_mask & IDISP_CODEC_MASK)
 		ctx->hdmi.idisp_codec = true;
 
 	if (board_quirk & SOF_DA7219_GLK_BOARD) {

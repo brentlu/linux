@@ -91,12 +91,7 @@ struct snd_soc_acpi_sdw_mach_params {
  *
  * @acpi_ipc_irq_index: used for BYT-CR detection
  * @platform: string used for HDAudio codec support
- * @codec_mask: used for HDAudio support
  * @dmic_num: number of SoC- or chipset-attached PDM digital microphones
- * @common_hdmi_codec_drv: use commom HDAudio HDMI codec driver
- * @link_mask: SoundWire links enabled on the board
- * @links: array of SoundWire link _ADR descriptors, null terminated
- * @i2s_link_mask: I2S/TDM links enabled on the board
  * @num_dai_drivers: number of elements in @dai_drivers
  * @dai_drivers: pointer to dai_drivers, used e.g. in nocodec mode
  * @subsystem_vendor: optional PCI SSID vendor value
@@ -110,12 +105,7 @@ struct snd_soc_acpi_sdw_mach_params {
 struct snd_soc_acpi_mach_params {
 	u32 acpi_ipc_irq_index;
 	const char *platform;
-	u32 codec_mask;
 	u32 dmic_num;
-	bool common_hdmi_codec_drv;
-	u32 link_mask;
-	const struct snd_soc_acpi_link_adr *links;
-	u32 i2s_link_mask;
 	u32 num_dai_drivers;
 	struct snd_soc_dai_driver *dai_drivers;
 	unsigned short subsystem_vendor;

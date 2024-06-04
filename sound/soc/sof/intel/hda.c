@@ -1025,7 +1025,6 @@ static void hda_generic_machine_select(struct snd_sof_dev *sdev,
 				 * Prevent SoundWire links from starting when an external
 				 * HDaudio codec is used
 				 */
-				hda_mach->mach_params.link_mask = 0;
 				hda_mach->mach_params.sdw.link_mask = 0;
 			} else {
 				/*
@@ -1035,7 +1034,6 @@ static void hda_generic_machine_select(struct snd_sof_dev *sdev,
 				 */
 				struct sof_intel_hda_dev *hdev = sdev->pdata->hw_pdata;
 
-				hda_mach->mach_params.link_mask = hdev->info.link_mask;
 				hda_mach->mach_params.sdw.link_mask = hdev->info.link_mask;
 			}
 
@@ -1046,8 +1044,6 @@ static void hda_generic_machine_select(struct snd_sof_dev *sdev,
 	/* used by hda machine driver to create dai links */
 	if (*mach) {
 		mach_params = &(*mach)->mach_params;
-		mach_params->codec_mask = bus->codec_mask;
-		mach_params->common_hdmi_codec_drv = true;
 		mach_params->hda.codec_mask = bus->codec_mask;
 		mach_params->hda.common_hdmi_codec_drv = true;
 	}
@@ -1129,8 +1125,6 @@ static struct snd_soc_acpi_mach *hda_sdw_machine_select(struct snd_sof_dev *sdev
 			break;
 	}
 	if (mach && mach->link_mask) {
-		mach->mach_params.links = mach->links;
-		mach->mach_params.link_mask = mach->link_mask;
 		mach->mach_params.sdw.links = mach->links;
 		mach->mach_params.sdw.link_mask = mach->link_mask;
 		mach->mach_params.platform = dev_name(sdev->dev);
@@ -1311,14 +1305,11 @@ struct snd_soc_acpi_mach *hda_machine_select(struct snd_sof_dev *sdev)
 		}
 
 		if (mach->link_mask) {
-			mach->mach_params.links = mach->links;
-			mach->mach_params.link_mask = mach->link_mask;
 			mach->mach_params.sdw.links = mach->links;
 			mach->mach_params.sdw.link_mask = mach->link_mask;
 		}
 
 		/* report SSP link mask to machine driver */
-		mach->mach_params.i2s_link_mask = check_nhlt_ssp_mask(sdev);
 		mach->mach_params.i2s.link_mask = check_nhlt_ssp_mask(sdev);
 
 		if (tplg_fixup &&

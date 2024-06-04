@@ -1035,8 +1035,7 @@ int hda_power_down_dsp(struct snd_sof_dev *sdev)
 EXPORT_SYMBOL_NS(hda_power_down_dsp, SND_SOC_SOF_INTEL_HDA_GENERIC);
 
 #if IS_ENABLED(CONFIG_SND_SOC_SOF_HDA_AUDIO_CODEC)
-static void hda_generic_machine_select(struct snd_sof_dev *sdev,
-				       struct snd_soc_acpi_mach **mach)
+static struct snd_soc_acpi_mach *hda_generic_machine_select(struct snd_sof_dev *sdev)
 {
 	struct hdac_bus *bus = sof_to_bus(sdev);
 	struct snd_soc_acpi_mach *hda_mach;
@@ -1048,74 +1047,76 @@ static void hda_generic_machine_select(struct snd_sof_dev *sdev,
 	/* codec detection */
 	if (!bus->codec_mask) {
 		dev_info(bus->dev, "no hda codecs found!\n");
-	} else {
-		dev_info(bus->dev, "hda codecs found, mask %lx\n",
-			 bus->codec_mask);
+		return NULL;
+	}
 
-		for (i = 0; i < HDA_MAX_CODECS; i++) {
-			if (bus->codec_mask & (1 << i))
-				codec_num++;
-		}
+	dev_info(bus->dev, "hda codecs found, mask %lx\n", bus->codec_mask);
+
+	for (i = 0; i < HDA_MAX_CODECS; i++) {
+		if (bus->codec_mask & (1 << i))
+			codec_num++;
+	}
+
+	/*
+	 * If no machine driver is found, then:
+	 *
+	 * generic hda machine driver can handle:
+	 *  - one HDMI codec, and/or
+	 *  - one external HDAudio codec
+	 */
+	if (codec_num <= 2) {
+		bool tplg_fixup = false;
+
+		hda_mach = &snd_soc_acpi_intel_hda_machines[SND_SOC_ACPI_INTEL_HDA_MACH_SOF];
+
+		dev_info(bus->dev, "using HDA machine driver %s now\n",
+			 hda_mach->drv_name);
 
 		/*
-		 * If no machine driver is found, then:
-		 *
-		 * generic hda machine driver can handle:
-		 *  - one HDMI codec, and/or
-		 *  - one external HDAudio codec
+		 * topology: use the info from hda_machines since tplg file name
+		 * is not overwritten
 		 */
-		if (!*mach && codec_num <= 2) {
-			bool tplg_fixup = false;
+		if (!pdata->tplg_filename)
+			tplg_fixup = true;
 
-			hda_mach = &snd_soc_acpi_intel_hda_machines[SND_SOC_ACPI_INTEL_HDA_MACH_SOF];
+		if (tplg_fixup &&
+		    codec_num == 1 && HDA_IDISP_CODEC(bus->codec_mask)) {
+			tplg_filename = devm_kasprintf(sdev->dev, GFP_KERNEL,
+						       "%s-idisp",
+						       hda_mach->sof_tplg_filename);
+			if (!tplg_filename)
+				return NULL;
 
-			dev_info(bus->dev, "using HDA machine driver %s now\n",
-				 hda_mach->drv_name);
-
-			/*
-			 * topology: use the info from hda_machines since tplg file name
-			 * is not overwritten
-			 */
-			if (!pdata->tplg_filename)
-				tplg_fixup = true;
-
-			if (tplg_fixup &&
-			    codec_num == 1 && HDA_IDISP_CODEC(bus->codec_mask)) {
-				tplg_filename = devm_kasprintf(sdev->dev, GFP_KERNEL,
-							       "%s-idisp",
-							       hda_mach->sof_tplg_filename);
-				if (!tplg_filename)
-					return;
-
-				hda_mach->sof_tplg_filename = tplg_filename;
-			}
-
-			if (codec_num == 2 ||
-			    (codec_num == 1 && !HDA_IDISP_CODEC(bus->codec_mask))) {
-				/*
-				 * Prevent SoundWire links from starting when an external
-				 * HDaudio codec is used
-				 */
-				hda_mach->mach_params.link_mask = 0;
-			} else {
-				/*
-				 * Allow SoundWire links to start when no external HDaudio codec
-				 * was detected. This will not create a SoundWire card but
-				 * will help detect if any SoundWire codec reports as ATTACHED.
-				 */
-				struct sof_intel_hda_dev *hdev = sdev->pdata->hw_pdata;
-
-				hda_mach->mach_params.link_mask = hdev->info.link_mask;
-			}
-
-			*mach = hda_mach;
+			hda_mach->sof_tplg_filename = tplg_filename;
 		}
+
+		if (codec_num == 2 ||
+		    (codec_num == 1 && !HDA_IDISP_CODEC(bus->codec_mask))) {
+			/*
+			 * Prevent SoundWire links from starting when an external
+			 * HDaudio codec is used
+			 */
+			hda_mach->mach_params.link_mask = 0;
+		} else {
+			/*
+			 * Allow SoundWire links to start when no external HDaudio codec
+			 * was detected. This will not create a SoundWire card but
+			 * will help detect if any SoundWire codec reports as ATTACHED.
+			 */
+			struct sof_intel_hda_dev *hdev = sdev->pdata->hw_pdata;
+
+			hda_mach->mach_params.link_mask = hdev->info.link_mask;
+		}
+
+		return hda_mach;
 	}
+
+	return NULL;
 }
 #else
-static void hda_generic_machine_select(struct snd_sof_dev *sdev,
-				       struct snd_soc_acpi_mach **mach)
+static struct snd_soc_acpi_mach *hda_generic_machine_select(struct snd_sof_dev *sdev)
 {
+	return NULL;
 }
 #endif
 
@@ -1316,7 +1317,7 @@ struct snd_soc_acpi_mach *hda_machine_select(struct snd_sof_dev *sdev)
 	 * Choose HDA generic machine driver if mach is NULL.
 	 */
 	if (!mach) {
-		hda_generic_machine_select(sdev, &mach);
+		mach = hda_generic_machine_select(sdev);
 		if (mach)
 			hda_mach_found = true;
 	}

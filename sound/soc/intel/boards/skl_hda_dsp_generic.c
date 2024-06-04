@@ -110,7 +110,7 @@ static int skl_hda_fill_card_info(struct snd_soc_card *card,
 	u32 codec_count, codec_mask;
 	int i, num_links, num_route;
 
-	codec_mask = mach_params->codec_mask;
+	codec_mask = mach_params->hda.codec_mask;
 	codec_count = hweight_long(codec_mask);
 	ctx->idisp_codec = !!(codec_mask & IDISP_CODEC_MASK);
 
@@ -222,7 +222,7 @@ static int skl_hda_audio_probe(struct platform_device *pdev)
 	ctx->pcm_count = card->num_links;
 	ctx->dai_index = 1; /* hdmi codec dai name starts from index 1 */
 	ctx->platform_name = mach->mach_params.platform;
-	ctx->common_hdmi_codec_drv = mach->mach_params.common_hdmi_codec_drv;
+	ctx->common_hdmi_codec_drv = mach->mach_params.hda.common_hdmi_codec_drv;
 
 	card->dev = &pdev->dev;
 	if (!snd_soc_acpi_sof_parent(&pdev->dev))

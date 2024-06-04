@@ -129,7 +129,7 @@ static int sof_ssp_amp_probe(struct platform_device *pdev)
 		ctx->dmic_be_num = 0;
 
 	if (sof_ssp_amp_quirk & SOF_HDMI_PLAYBACK_PRESENT) {
-		if (mach->mach_params.codec_mask & IDISP_CODEC_MASK)
+		if (mach->mach_params.hda.codec_mask & IDISP_CODEC_MASK)
 			ctx->hdmi.idisp_codec = true;
 	} else {
 		ctx->hdmi_num = 0;

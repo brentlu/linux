@@ -622,7 +622,7 @@ static int sof_es8336_probe(struct platform_device *pdev)
 	 * SSP will be set.
 	 */
 	if (mach->tplg_quirk_mask & SND_SOC_ACPI_TPLG_INTEL_SSP_NUMBER) {
-		if (!mach->mach_params.i2s_link_mask) {
+		if (!mach->mach_params.i2s.link_mask) {
 			dev_warn(dev, "No I2S link information provided, using SSP0. This may need to be modified with the quirk module parameter\n");
 		} else {
 			/*
@@ -635,7 +635,7 @@ static int sof_es8336_probe(struct platform_device *pdev)
 			unsigned long ssp;
 
 			/* fls returns 1-based results, SSPs indices are 0-based */
-			ssp = fls(mach->mach_params.i2s_link_mask) - 1;
+			ssp = fls(mach->mach_params.i2s.link_mask) - 1;
 
 			quirk |= ssp;
 		}

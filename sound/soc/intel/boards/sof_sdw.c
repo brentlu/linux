@@ -1563,7 +1563,7 @@ static int count_sdw_endpoints(struct snd_soc_card *card, int *num_devs, int *nu
 	const struct snd_soc_acpi_link_adr *adr_link;
 	int i;
 
-	for (adr_link = mach_params->links; adr_link->num_adr; adr_link++) {
+	for (adr_link = mach_params->sdw.links; adr_link->num_adr; adr_link++) {
 		*num_devs += adr_link->num_adr;
 
 		for (i = 0; i < adr_link->num_adr; i++)
@@ -1607,7 +1607,7 @@ static int parse_sdw_endpoints(struct snd_soc_card *card,
 	int i, j;
 	int ret;
 
-	for (adr_link = mach_params->links; adr_link->num_adr; adr_link++) {
+	for (adr_link = mach_params->sdw.links; adr_link->num_adr; adr_link++) {
 		int num_link_dailinks = 0;
 
 		if (!is_power_of_2(adr_link->mask)) {
@@ -2051,7 +2051,7 @@ static int sof_card_dai_links_create(struct snd_soc_card *card)
 		ssp_num = hweight_long(ssp_mask);
 	}
 
-	if (mach_params->codec_mask & IDISP_CODEC_MASK)
+	if (mach_params->hda.codec_mask & IDISP_CODEC_MASK)
 		ctx->hdmi.idisp_codec = true;
 
 	if (sof_sdw_quirk & SOF_SDW_TGL_HDMI)

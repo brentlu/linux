@@ -21,9 +21,6 @@
 #include "../../codecs/nau8825.h"
 #include "../common/soc-intel-quirks.h"
 #include "sof_board_helpers.h"
-#include "sof_realtek_common.h"
-#include "sof_maxim_common.h"
-#include "sof_nuvoton_common.h"
 
 static unsigned long sof_nau8825_quirk = SOF_SSP_PORT_CODEC(0);
 
@@ -199,36 +196,6 @@ sof_card_dai_links_create(struct device *dev, struct snd_soc_card *card,
 	ctx->codec_link->exit = sof_nau8825_codec_exit;
 	ctx->codec_link->ops = &sof_nau8825_ops;
 
-	if (ctx->amp_type == CODEC_NONE)
-		return 0;
-
-	if (!ctx->amp_link) {
-		dev_err(dev, "amp link not available");
-		return -EINVAL;
-	}
-
-	/* codec-specific fields for speaker amplifier */
-	switch (ctx->amp_type) {
-	case CODEC_MAX98360A:
-		max_98360a_dai_link(ctx->amp_link);
-		break;
-	case CODEC_MAX98373:
-		max_98373_dai_link(dev, ctx->amp_link);
-		break;
-	case CODEC_NAU8318:
-		nau8318_set_dai_link(ctx->amp_link);
-		break;
-	case CODEC_RT1015P:
-		sof_rt1015p_dai_link(ctx->amp_link);
-		break;
-	case CODEC_RT1019P:
-		sof_rt1019p_dai_link(ctx->amp_link);
-		break;
-	default:
-		dev_err(dev, "invalid amp type %d\n", ctx->amp_type);
-		return -EINVAL;
-	}
-
 	return 0;
 }
 
@@ -257,23 +224,10 @@ static int sof_audio_probe(struct platform_device *pdev)
 		return ret;
 
 	/* update codec_conf */
-	switch (ctx->amp_type) {
-	case CODEC_MAX98373:
-		max_98373_set_codec_conf(&sof_audio_card_nau8825);
-		break;
-	case CODEC_RT1015P:
-		sof_rt1015p_codec_conf(&sof_audio_card_nau8825);
-		break;
-	case CODEC_MAX98360A:
-	case CODEC_NAU8318:
-	case CODEC_RT1019P:
-	case CODEC_NONE:
-		/* no codec conf required */
-		break;
-	default:
-		dev_err(&pdev->dev, "invalid amp type %d\n", ctx->amp_type);
-		return -EINVAL;
-	}
+	ret = sof_intel_board_set_codec_conf(&pdev->dev, &sof_audio_card_nau8825,
+					     ctx);
+	if (ret)
+		return ret;
 
 	sof_audio_card_nau8825.dev = &pdev->dev;
 
@@ -340,6 +294,3 @@ MODULE_AUTHOR("Mac Chiang <mac.chiang@intel.com>");
 MODULE_AUTHOR("Brent Lu <brent.lu@intel.com>");
 MODULE_LICENSE("GPL");
 MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_BOARD_HELPERS);
-MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_MAXIM_COMMON);
-MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_NUVOTON_COMMON);
-MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_REALTEK_COMMON);

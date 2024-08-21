@@ -6,6 +6,10 @@
 #include "../common/soc-intel-quirks.h"
 #include "hda_dsp_common.h"
 #include "sof_board_helpers.h"
+#include "sof_cirrus_common.h"
+#include "sof_maxim_common.h"
+#include "sof_nuvoton_common.h"
+#include "sof_realtek_common.h"
 
 /*
  * Intel HDMI DAI Link
@@ -285,7 +289,48 @@ static int set_ssp_amp_link(struct device *dev, struct snd_soc_dai_link *link,
 	link->cpus = cpus;
 	link->num_cpus = 1;
 
-	/* codecs - caller to handle */
+	/* codecs */
+	switch (amp_type) {
+	case CODEC_CS35L41:
+		cs35l41_set_dai_link(link);
+		break;
+	case CODEC_MAX98357A:
+		max_98357a_dai_link(link);
+		break;
+	case CODEC_MAX98360A:
+		max_98360a_dai_link(link);
+		break;
+	case CODEC_MAX98373:
+		max_98373_dai_link(dev, link);
+		break;
+	case CODEC_MAX98390:
+		max_98390_dai_link(dev, link);
+		break;
+	case CODEC_NAU8318:
+		nau8318_set_dai_link(link);
+		break;
+	case CODEC_RT1011:
+		sof_rt1011_dai_link(dev, link);
+		break;
+	case CODEC_RT1015:
+		sof_rt1015_dai_link(link);
+		break;
+	case CODEC_RT1015P:
+		sof_rt1015p_dai_link(link);
+		break;
+	case CODEC_RT1019P:
+		sof_rt1019p_dai_link(link);
+		break;
+	case CODEC_RT1308:
+		sof_rt1308_dai_link(link);
+		break;
+	case CODEC_RT5650:
+		/* caller to handle */
+		break;
+	default:
+		dev_err(dev, "invalid amp type %d\n", amp_type);
+		return -EINVAL;
+	}
 
 	/* platforms */
 	link->platforms = platform_component;
@@ -588,6 +633,47 @@ int sof_intel_board_set_dai_link(struct device *dev, struct snd_soc_card *card,
 }
 EXPORT_SYMBOL_NS(sof_intel_board_set_dai_link, SND_SOC_INTEL_SOF_BOARD_HELPERS);
 
+int sof_intel_board_set_codec_conf(struct device *dev, struct snd_soc_card *card,
+				   struct sof_card_private *ctx)
+{
+	/* update codec_conf */
+	switch (ctx->amp_type) {
+	case CODEC_CS35L41:
+		cs35l41_set_codec_conf(card);
+		break;
+	case CODEC_MAX98373:
+		max_98373_set_codec_conf(card);
+		break;
+	case CODEC_MAX98390:
+		max_98390_set_codec_conf(dev, card);
+		break;
+	case CODEC_RT1011:
+		sof_rt1011_codec_conf(dev, card);
+		break;
+	case CODEC_RT1015:
+		sof_rt1015_codec_conf(card);
+		break;
+	case CODEC_RT1015P:
+		sof_rt1015p_codec_conf(card);
+		break;
+	case CODEC_MAX98357A:
+	case CODEC_MAX98360A:
+	case CODEC_NAU8318:
+	case CODEC_RT1019P:
+	case CODEC_RT1308:
+	case CODEC_RT5650:
+	case CODEC_NONE:
+		/* no codec conf required */
+		break;
+	default:
+		dev_err(dev, "invalid amp type %d\n", ctx->amp_type);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL_NS(sof_intel_board_set_codec_conf, SND_SOC_INTEL_SOF_BOARD_HELPERS);
+
 struct sof_card_private *
 sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk)
 {
@@ -635,4 +721,8 @@ MODULE_DESCRIPTION("ASoC Intel SOF Machine Driver Board Helpers");
 MODULE_AUTHOR("Brent Lu <brent.lu@intel.com>");
 MODULE_LICENSE("GPL");
 MODULE_IMPORT_NS(SND_SOC_INTEL_HDA_DSP_COMMON);
+MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_CIRRUS_COMMON);
+MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_MAXIM_COMMON);
+MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_NUVOTON_COMMON);
+MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_REALTEK_COMMON);
 MODULE_IMPORT_NS(SND_SOC_ACPI_INTEL_MATCH);

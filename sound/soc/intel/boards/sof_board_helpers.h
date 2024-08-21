@@ -164,6 +164,8 @@ struct sof_card_private {
 int sof_intel_board_card_late_probe(struct snd_soc_card *card);
 int sof_intel_board_set_dai_link(struct device *dev, struct snd_soc_card *card,
 				 struct sof_card_private *ctx);
+int sof_intel_board_set_codec_conf(struct device *dev, struct snd_soc_card *card,
+				   struct sof_card_private *ctx);
 struct sof_card_private *
 sof_intel_board_get_ctx(struct device *dev, unsigned long board_quirk);
 

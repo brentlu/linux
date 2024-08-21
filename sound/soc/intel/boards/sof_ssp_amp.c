@@ -18,8 +18,6 @@
 #include <sound/pcm_params.h>
 #include <sound/sof.h>
 #include "sof_board_helpers.h"
-#include "sof_realtek_common.h"
-#include "sof_cirrus_common.h"
 
 /* Driver-specific board quirks: from bit 0 to 7 */
 #define SOF_HDMI_PLAYBACK_PRESENT		BIT(0)
@@ -74,40 +72,6 @@ static struct snd_soc_card sof_ssp_amp_card = {
 					BT_OFFLOAD_BE_ID,     \
 					0)
 
-static int
-sof_card_dai_links_create(struct device *dev, struct snd_soc_card *card,
-			  struct sof_card_private *ctx)
-{
-	int ret;
-
-	ret = sof_intel_board_set_dai_link(dev, card, ctx);
-	if (ret)
-		return ret;
-
-	if (ctx->amp_type == CODEC_NONE)
-		return 0;
-
-	if (!ctx->amp_link) {
-		dev_err(dev, "amp link not available");
-		return -EINVAL;
-	}
-
-	/* codec-specific fields for speaker amplifier */
-	switch (ctx->amp_type) {
-	case CODEC_CS35L41:
-		cs35l41_set_dai_link(ctx->amp_link);
-		break;
-	case CODEC_RT1308:
-		sof_rt1308_dai_link(ctx->amp_link);
-		break;
-	default:
-		dev_err(dev, "invalid amp type %d\n", ctx->amp_type);
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
 static int sof_ssp_amp_probe(struct platform_device *pdev)
 {
 	struct snd_soc_acpi_mach *mach = pdev->dev.platform_data;
@@ -143,23 +107,14 @@ static int sof_ssp_amp_probe(struct platform_device *pdev)
 	}
 
 	/* update dai_link */
-	ret = sof_card_dai_links_create(&pdev->dev, &sof_ssp_amp_card, ctx);
+	ret = sof_intel_board_set_dai_link(&pdev->dev, &sof_ssp_amp_card, ctx);
 	if (ret)
 		return ret;
 
 	/* update codec_conf */
-	switch (ctx->amp_type) {
-	case CODEC_CS35L41:
-		cs35l41_set_codec_conf(&sof_ssp_amp_card);
-		break;
-	case CODEC_RT1308:
-	case CODEC_NONE:
-		/* no codec conf required */
-		break;
-	default:
-		dev_err(&pdev->dev, "invalid amp type %d\n", ctx->amp_type);
-		return -EINVAL;
-	}
+	ret = sof_intel_board_set_codec_conf(&pdev->dev, &sof_ssp_amp_card, ctx);
+	if (ret)
+		return ret;
 
 	sof_ssp_amp_card.dev = &pdev->dev;
 
@@ -229,5 +184,3 @@ MODULE_AUTHOR("Balamurugan C <balamurugan.c@intel.com>");
 MODULE_AUTHOR("Brent Lu <brent.lu@intel.com>");
 MODULE_LICENSE("GPL");
 MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_BOARD_HELPERS);
-MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_REALTEK_COMMON);
-MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_CIRRUS_COMMON);

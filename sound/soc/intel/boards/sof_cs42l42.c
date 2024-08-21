@@ -21,7 +21,6 @@
 #include <dt-bindings/sound/cs42l42.h>
 #include "../common/soc-intel-quirks.h"
 #include "sof_board_helpers.h"
-#include "sof_maxim_common.h"
 
 static struct snd_soc_jack_pin jack_pins[] = {
 	{
@@ -174,27 +173,6 @@ sof_card_dai_links_create(struct device *dev, struct snd_soc_card *card,
 	ctx->codec_link->exit = sof_cs42l42_exit;
 	ctx->codec_link->ops = &sof_cs42l42_ops;
 
-	if (ctx->amp_type == CODEC_NONE)
-		return 0;
-
-	if (!ctx->amp_link) {
-		dev_err(dev, "amp link not available");
-		return -EINVAL;
-	}
-
-	/* codec-specific fields for speaker amplifier */
-	switch (ctx->amp_type) {
-	case CODEC_MAX98357A:
-		max_98357a_dai_link(ctx->amp_link);
-		break;
-	case CODEC_MAX98360A:
-		max_98360a_dai_link(ctx->amp_link);
-		break;
-	default:
-		dev_err(dev, "invalid amp type %d\n", ctx->amp_type);
-		return -EINVAL;
-	}
-
 	return 0;
 }
 
@@ -234,6 +212,12 @@ static int sof_audio_probe(struct platform_device *pdev)
 
 	/* update dai_link */
 	ret = sof_card_dai_links_create(&pdev->dev, &sof_audio_card_cs42l42, ctx);
+	if (ret)
+		return ret;
+
+	/* update codec_conf */
+	ret = sof_intel_board_set_codec_conf(&pdev->dev, &sof_audio_card_cs42l42,
+					     ctx);
 	if (ret)
 		return ret;
 
@@ -304,4 +288,3 @@ MODULE_DESCRIPTION("SOF Audio Machine driver for CS42L42");
 MODULE_AUTHOR("Brent Lu <brent.lu@intel.com>");
 MODULE_LICENSE("GPL");
 MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_BOARD_HELPERS);
-MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_MAXIM_COMMON);
